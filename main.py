@@ -64,8 +64,21 @@ def deletaLogin(c_login):
 
     conexao.close()
 
-def opSair():
-    return 
+def deletaProduto(p_id):
+    conexao = sqlite3.connect('cadastros.db')
+    cursor = conexao.cursor()
+
+    cursor.execute("SELECT * FROM produtos WHERE id = ?", (p_id,))
+    resultado = cursor.fetchone()
+
+    if resultado:
+        cursor.execute("DELETE FROM produtos WHERE id = ?", (p_id,))
+        conexao.commit()  
+        print(f"Produto '{p_id}' deletado com sucesso.")
+    else:
+        print(f"Produto '{p_id}' não encontrado.")
+
+    conexao.close()
 
 def esp():
     print('\n')
@@ -187,6 +200,9 @@ while True:
                             sleep(2)
 
                             if p2 == 1:
+                                conexao = sqlite3.connect('cadastros.db')
+                                cursor = conexao.cursor()
+
                                 p_nome = str(input('Digite o nome do produto a ser inserido:')).upper().strip()
 
                                 if p_nome == 'Ç':
@@ -225,12 +241,117 @@ while True:
                                 """, (p_nome, p_preco,p_qtd))
 
                                 conexao.commit()
+                                
+                                print(f' O produto inserido foi {p_nome}, com o preço {p_preco} e na quantidade {p_qtd} ')  
+
                                 conexao.close()
 
-                                print(f' O produto inserido foi {p_nome}, com o preço {p_preco} e na quantidade {p_qtd} ')  
-                                 
-                            if p2 == 2:
-                                pass             
+                            elif p2 == 2:
+                                # MODIFICAR PRODUTOS 
+                                conexao = sqlite3.connect('cadastros.db')
+                                cursor = conexao.cursor()
+                                p_id = input('Digite o id do produto a ser modificado: ').strip()
+
+                                if p_id == '0':
+                                    break
+
+                                if not p_id.isdigit():
+                                    print("ID inválido!")
+                                else:
+                                    p_id = int(p_id)
+                                    
+
+                                p_nomen = str(input('Digite o novo nome do produto:')).upper().strip()
+
+                                if p_nomen == 'Ç':
+                                    break
+
+                                while not p_nomen.isalpha():
+                                    print('Nome inválido!')
+                                    p_nomen = input('Digite o nome do produto a ser modificado: ').upper().strip()
+                                
+                                try:
+                                    p_precon = float(input('Digite o novo preço do produto(COM . AO INVÉS DE ,): ').strip())
+                                except ValueError:
+                                    print("Preço inválido!")
+                                    p_precon = 0.0  # Valor padrão em caso de erro
+
+                                if p_precon == 0:
+                                    break
+
+                                p_qtdn = input('Digite a nova quantidade inserida no estoque: ').strip()
+
+                                if p_qtdn == '0':
+                                    break
+
+                                while not p_qtdn.isdigit():
+                                    print('Quantidade inválida!')
+                                    p_qtdn = input('Digite a nova quantidade inserida no estoque: ').strip()
+
+                                p_qtdn = int(p_qtdn)  
+
+                                cursor.execute("SELECT * FROM produtos WHERE id = ?", (p_id,))
+
+                                id_prod = cursor.fetchone()
+
+                                if id_prod:
+                                    cursor.execute("UPDATE produtos SET nome = ?, preco = ?,qtd = ? WHERE id = ?",(p_nomen,p_precon,p_qtdn,p_id))
+                                    conexao.commit()
+                                    print("Produto atualizado")
+                                else:
+                                    print('Produto não encontrado')
+
+                                conexao.close()
+                                
+                            elif p2 == 3:
+                                conexao = sqlite3.connect('cadastros.db')
+                                cursor = conexao.cursor()
+
+                                cursor.execute("SELECT * FROM produtos;")
+
+                                produ = cursor.fetchall()
+
+                                for prods in produ:
+                                    print(prods)
+
+                                pDeletar = input('Qual produto você deseja deletar?(Digite o ID) ').strip()
+
+                                if pDeletar == '0':
+                                    break
+
+                                simNao = input(f'Deseja mesmo deletar o produto de ID {pDeletar}? \n 1 - SIM \n 2 - NÃO\n').strip()
+
+                                if int(simNao) == 0:
+                                    break
+
+                                if simNao.isdigit() and int(simNao) == 1:
+                                    deletaProduto(pDeletar)
+                                    print("Produto deletado com Sucesso!")
+                                else:
+                                    print("Operação cancelada!")
+
+
+                            elif p2 == 4:
+                                conexao = sqlite3.connect("cadastros.db")
+
+                                cursor = conexao.cursor()
+
+                                cursor.execute("SELECT * FROM produtos;")
+
+                                produ = cursor.fetchall()
+
+                                for prods in produ:
+                                    print(prods)
+
+                                sleep(2.5)
+
+                                conexao.close()
+
+                            elif p2 == 5:
+                                sys.exit()
+
+                            elif p1 > 5 or p1 < 1:
+                                print("Opção Invalida!")        
                         
                     else:
                         print("Senha incorreta, tente novamente.")
