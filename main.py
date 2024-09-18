@@ -102,6 +102,7 @@ while True:
             else:
                 while True:
                     c_senha = input('Digite sua senha de login (Apenas números): ')
+
                     if c_senha == 0:
                         break
 
@@ -148,17 +149,89 @@ while True:
                         print("Login realizado com sucesso!")
                         loginn = c_login
 
-                        #COLOCAR O SISTEMA DE PRODUTOS
-                        ##
-                        #
-                        #
-                        #
-                        #
-                        #
-                        #
-                        #
-                        #
-                        break
+                        sleep(1.5)
+
+                        # Estabelecer conexão com o banco de dados
+                        conexao = sqlite3.connect("cadastros.db")
+
+                        # Criar um cursor para executar comandos SQL
+                        cursor = conexao.cursor()
+
+                        # Cria tabela cadastros
+                        cursor.execute("""
+                        CREATE TABLE IF NOT EXISTS produtos (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+                            nome TEXT NOT NULL,
+                            preco FLOAT NOT NULL,
+                            qtd INT DEFAULT 0 NOT NULL
+                        )
+                        """)
+
+                        # Salvar as alterações no banco de dados
+                        conexao.commit()
+
+                        while True:
+                            print('-/'*10, " Menu de Produtos ", '-/'*10, "\n 1- Cadastrar produto \n 2- Modificar produtos \n 3- Deletar Produtos \n 4- Ver produtos\n 5- Sair do sistema")
+                            
+                            p2 = input('Digite a opção selecionada:')
+
+                            while not p2.isdigit():
+                                print('A opção digitada não é um número.')
+                                p2 = input('Digite a opção selecionada:')
+
+                            p2 = int(p2)
+
+                            esp()
+                            print("Digite 0 ou ç para sair de qualquer opção e voltar para o MENU")
+                            esp()
+                            sleep(2)
+
+                            if p2 == 1:
+                                p_nome = str(input('Digite o nome do produto a ser inserido:')).upper().strip()
+
+                                if p_nome == 'Ç':
+                                    break
+
+                                while True:
+                                    if p_nome.isalpha():
+                                        break
+                                    else:
+                                        print('Nome invalido!')
+                                        sleep(1)
+                                        p_nome = str(input('Digite o nome do produto a ser inserido:')).upper().strip()
+
+                                p_preco = float(input('Digite o preço do produto:'))
+
+                                if p_preco == '0':
+                                    break
+
+                                p_qtd= input('Digite a quantidade inserida no estoque:')
+
+                                if p_qtd == '0':
+                                    break
+
+                                while True:
+                                    if p_qtd.isdigit():
+                                        p_qtd = int(p_qtd)
+                                        break
+                                    else: 
+                                        print('Numero invalido')
+                                        sleep(1)
+                                        p_qtd= input('Digite a quantidade inserida no estoque:')
+
+                                cursor.execute("""
+                                INSERT INTO produtos (nome, preco,qtd)
+                                VALUES (?, ?,?)
+                                """, (p_nome, p_preco,p_qtd))
+
+                                conexao.commit()
+                                conexao.close()
+
+                                print(f' O produto inserido foi {p_nome}, com o preço {p_preco} e na quantidade {p_qtd} ')  
+                                 
+                            if p2 == 2:
+                                pass             
+                        
                     else:
                         print("Senha incorreta, tente novamente.")
                         sleep(1)
