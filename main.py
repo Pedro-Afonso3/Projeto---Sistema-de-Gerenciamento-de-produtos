@@ -4,6 +4,7 @@ import sqlite3
 import sys
 
 loginn = ''
+sair = False
 
 # Estabelecer conexão com o banco de dados
 conexao = sqlite3.connect("cadastros.db")
@@ -83,9 +84,21 @@ def deletaProduto(p_id):
 def esp():
     print('\n')
 
+def trocarSenha(lTrocarSenha,novaSenha):
+    cursor.execute("SELECT * FROM cadastros WHERE nome = ?", (lTrocarSenha,))
+    nome_login = cursor.fetchone()
+
+    if nome_login:
+        cursor.execute("UPDATE produtos SET login = ?, senha = ? WHERE login = ?",(lTrocarSenha,novaSenha,lTrocarSenha))
+        conexao.commit()
+        print("Senha atualizada")
+    else:
+        print('Usuario não encontrado')
+
 while True:
+    p2 = 0
     sleep(1)
-    print('-/'*10, " Menu Inicial ", '-/'*10, f"\n |*||*| Bem-vindo {loginn} |*||*| \n 1- Cadastrar no sistema \n 2- Logar no sistema \n 3- Deletar cadastro \n 4- Ver usuarios cadastrados\n 5- Sair do sistema")
+    print('-/'*10, " Menu Inicial ", '-/'*10, f"\n |*||*| Bem-vindo {loginn} |*||*| \n 1- Cadastrar no sistema \n 2- Logar no sistema \n 3- Deletar cadastro(FUNÇÃO EXCLUSIVA ADM) \n 4- Ver usuarios cadastrados \n 5- Trocar senha(FUNÇÃO EXCLUSIVA ADM) \n 6- Sair do sistema")
 
     p1 = input('Digite a opção selecionada:')
 
@@ -146,6 +159,9 @@ while True:
 
     elif p1 == 2:
         while True:
+            if p2 == 5:
+                break
+
             c_login = input("Digite seu login: ").upper().strip()
 
             if c_login == 'Ç':
@@ -153,6 +169,9 @@ while True:
 
             if validar_login(c_login):
                 while True:
+                    if p2 == 5:
+                        break
+
                     c_senha = input("Digite sua senha: ").strip()
 
                     if int(c_senha) == 0:
@@ -184,20 +203,21 @@ while True:
                         conexao.commit()
 
                         while True:
-                            print('-/'*10, " Menu de Produtos ", '-/'*10, "\n 1- Cadastrar produto \n 2- Modificar produtos \n 3- Deletar Produtos \n 4- Ver produtos\n 5- Sair do sistema")
-                            
+                            print('-/'*10, " Menu de Produtos ", '-/'*10, "\n 1- Cadastrar produto \n 2- Modificar produtos \n 3- Deletar Produtos \n 4- Ver produtos\n 5- Sair do menu dos produtos")
+                            print('')
+
                             p2 = input('Digite a opção selecionada:')
 
                             while not p2.isdigit():
                                 print('A opção digitada não é um número.')
                                 p2 = input('Digite a opção selecionada:')
 
-                            p2 = int(p2)
-
                             esp()
                             print("Digite 0 ou ç para sair de qualquer opção e voltar para o MENU")
                             esp()
                             sleep(2)
+
+                            p2 = int(p2)
 
                             if p2 == 1:
                                 conexao = sqlite3.connect('cadastros.db')
@@ -348,7 +368,7 @@ while True:
                                 conexao.close()
 
                             elif p2 == 5:
-                                sys.exit()
+                                break
 
                             elif p1 > 5 or p1 < 1:
                                 print("Opção Invalida!")        
@@ -411,9 +431,50 @@ while True:
             sleep(3)
         conexao.close()
 
+
     elif p1 == 5:
+        try:
+            conexao = sqlite3.connect('cadastros.db')
+            cursor = conexao.cursor()
+
+            cursor.execute("SELECT * FROM cadastros WHERE login = ?", (c_login,))
+            loginadm = cursor.fetchone()
+
+            if loginadm and loginadm[0] == 'ADMIN':
+                cursor.execute("SELECT * FROM cadastros;")
+
+                usuarios = cursor.fetchall()
+
+                for usuario in usuarios:
+                    print(usuario)
+
+                lTrocarSenha = input('Qual Usuario você deseja trocar senha? ').upper().strip()
+
+                if lTrocarSenha == 'Ç':
+                    break
+
+                novaSenha = input("Digite a nova senha do usuario").strip()
+
+                if novaSenha == '0':
+                    break
+
+                simNao = input(f'Deseja mesmo trocar senha do usuário {lTrocarSenha}? \n 1 - SIM \n 2 - NÃO\n')
+
+                if int(simNao) == 0:
+                    break
+
+                if simNao.isdigit() and int(simNao) == 1:
+                    trocarSenha(lTrocarSenha,novaSenha)
+                else:
+                    print("Operação cancelada!")
+            else:
+                print("Você não tem permissão para trocar senhas de usuarios.")
+        except NameError:
+            print("Você deve logar primeiro para poder acessar essa opção")
+        
+    elif p1 == 6:
         sys.exit()
 
-    elif p1 > 5 or p1 < 1:
+    elif p1 > 6 or p1 < 1:
         print("Opção Invalida!")
     

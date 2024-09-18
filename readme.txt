@@ -6,10 +6,19 @@
  CADASTRAR UM USUARIO, 
  LOGAR NO SISTEMA, 
  DELETAR CADASTROS(SO PODE SER ACESSADO PELO ADMIN), 
- VER USUARIOS CADASTRADOS(A SENHA É MOSTRADA COMO '*')
+ VER USUARIOS CADASTRADOS(A SENHA É MOSTRADA COMO '*'),
+ TROCAR SENHA (SO PODE SER ACESSADO PELO ADMIN)
  E SAIR DO SISTEMA
 
-2 -  PRETENDO IMPLEMENTAR:
- OPÇÃO DE TROCAR SENHA,
- O SISTEMA DE PRODUTOS EM SI,
+2 - NO MENU SECUNDARIA(MENU DOS PRODUTOS) PODE-SE:
+Cadastrar produto ,
+Modificar produtos,
+Deletar Produtos,
+Ver produtos e 
+Voltar pro Menu principal
+
+Funções menores:
+-Verifica se o valor digitado corresponde ao pedido(numero ou letra) e pede para digitar novamente
+-Tem conexão com o banco de dados sqllite3
+-
  
